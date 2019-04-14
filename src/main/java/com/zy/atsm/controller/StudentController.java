@@ -1,6 +1,9 @@
 package com.zy.atsm.controller;
 
+import com.zy.atsm.dao.ReportDao;
+import com.zy.atsm.entity.Report;
 import com.zy.atsm.entity.StudentInfo;
+import com.zy.atsm.service.IReportService;
 import com.zy.atsm.service.IStudentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -21,6 +24,8 @@ public class StudentController {
     @Autowired
     IStudentService studentService;
 
+    @Autowired
+    IReportService reportService;
 
     /**
      * 显示个人信息
@@ -83,8 +88,48 @@ public class StudentController {
         } else {
             out.print("<script language=\"javascript\">alert('对不起账号或者密码错误')</script>");
         }
-            return null;
+            return "login";
 
     }
+
+    @RequestMapping("report")
+    public String report(){
+        return "report";
+    }
+
+    /**
+     * 发起项目
+     *
+     */
+    @RequestMapping("/reportScore")
+    public void reportScore(HttpServletRequest request,String projectName,String score,String reason){
+
+        Integer id = (Integer) request.getSession().getAttribute("id");
+
+        List<StudentInfo> list = studentService.showStudentInfo(id);
+
+        StudentInfo info =(StudentInfo) list.get(0);
+
+        String studentName = info.getStudentName();
+
+        Report report = new Report();
+
+        report.setProjectName(projectName);
+
+        report.setReason(reason);
+
+        report.setStudentId(info.getId());
+
+        report.setStudentName(studentName);
+
+        report.setCredit(score);
+
+        reportService.addProject(report);
+
+        }
+
+
+
+
 
 }
